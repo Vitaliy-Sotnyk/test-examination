@@ -1,6 +1,6 @@
 # test-examination
 # installation
-$ npm install
+```$ npm install```
 
 # running
 ```
