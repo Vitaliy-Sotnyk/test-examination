@@ -5,8 +5,8 @@
   "scripts": {
     "lint": "eslint . --ext .ts",
     "test:playwright": "npx playwright test",
-    "test:jest": "jest tests/**/*.jest.spec.ts --detectOpenHandles",
-    "test:mocha": "mocha --require dotenv/config 'tests/**/*.mocha.spec.ts' --reporter mochawesome --reporter-options reportDir=reports/mocha",
+    "test:jest": "jest",
+    "test:mocha": "mocha",
     "test:all": "npm run test:playwright && npm run test:mocha && npm run test:jest"
   },
   "keywords": [],
@@ -24,6 +24,7 @@
     "@typescript-eslint/eslint-plugin": "^8.8.1",
     "@typescript-eslint/parser": "^8.8.1",
     "chai": "^4.5.0",
+    "dotenv": "^16.4.5",
     "eslint": "^8.57.1",
     "globals": "^15.10.0",
     "jest": "^29.7.0",
@@ -37,7 +38,6 @@
     "typescript-eslint": "^8.8.1"
   },
   "dependencies": {
-    "dotenv": "^16.4.5",
     "jest-html-reporters": "^3.1.7"
   }
 }

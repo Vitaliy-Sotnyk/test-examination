@@ -1,0 +1,10 @@
+{
+  "require": ["ts-node/register", "dotenv/config"],
+  "extension": ["ts"],
+  "spec": "tests/**/*.mocha.spec.ts",
+  "timeout": 120000,
+  "reporter": "mochawesome",
+  "reporterOptions": [
+    "reportDir=reports/mocha"
+  ]
+}

@@ -4,7 +4,7 @@ import MainPage from './pages/main.page';
 import pageData from './data/mainPageData.json';
 import { expect } from 'chai';
 
-describe('Mocha:', () => {
+describe('Mocha: main page of OLX', () => {
     it('opened page has the right title', async () => {
       const browser = await chromium.launch();
       const page = await browser.newPage();
