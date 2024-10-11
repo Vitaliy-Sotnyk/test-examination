@@ -18,7 +18,7 @@ export default defineConfig({
     ],
   ],
   use: {
-    headless: true, // Run tests in headless browsers.
+    headless: false, // Run tests in headless browsers.
     trace: 'on-first-retry',
   },
 
