@@ -1,5 +1,6 @@
 import { Page, Locator, APIRequestContext } from 'playwright';
 import errorMessageGenerator from './errorMessageGenerator';
+import apiUrls from '../apiUrls/apiUrls.json'
 
 type ElementAction<T = void> = (element: Locator) => Promise<T>;
 
@@ -44,7 +45,7 @@ export async function getAllSearchedItemsWithApi<Item>(request: APIRequestContex
   const pageSize = 40;
 
   while (hasMore) {
-    const response = await getApiRequest<ApiResponse<Item>>(request, `${url}api/v1/offers?offset=${offset}&query=${searchedItemName}`);
+    const response = await getApiRequest<ApiResponse<Item>>(request, `${url}${apiUrls.getOffers}${offset}&query=${searchedItemName}`);
     if (!response.data) {
       hasMore = false;
       break; 
@@ -55,15 +56,6 @@ export async function getAllSearchedItemsWithApi<Item>(request: APIRequestContex
   }
   return results;
 }
-
-export async function getApiRequestWithApi<Item>(request: APIRequestContext, url: string): Promise<Item> {
-  const response: ApiResponse<Item> = await getApiRequest(request, url)
-  if (!response.data) {
-    errorMessageGenerator(url, status);
-  }
-  return response as Item;
-}
-
 
 async function getApiRequest<T>(request: APIRequestContext, url: string): Promise<T> {
   const response = await request.get(url);

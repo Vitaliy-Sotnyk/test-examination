@@ -1,0 +1,3 @@
+{
+    "getOffers": "api/v1/offers?offset="
+}

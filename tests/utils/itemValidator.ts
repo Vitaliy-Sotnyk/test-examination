@@ -21,7 +21,7 @@ export async function itemsValidator(data: {
         if(await childElement.count() > 0) {
             const propertiesData = data.expectedProperties[index].length === data.children.length
                 ? data.expectedProperties[index][elementIndex]
-                :data.expectedProperties[index][0];
+                : data.expectedProperties[index][0];
 
             await data.decorator.checkElementProperties({
                 element: childElement, 

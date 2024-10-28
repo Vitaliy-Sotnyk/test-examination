@@ -26,7 +26,6 @@ test.describe('Playwright: search functionality of OLX', () => {
         await validateElement(page, mainPage.searchField, performAction('fill', [searchString]));
         await validateElement(page, mainPage.searchButton, performAction('click'));
         const listOfTitles: string[] = await validateElement(page, searchPage.searchedItemsTitle, performAction('innerText'));
-        console.log(listOfTitles);
         expect(everyItemsIncludesSearchElement(listOfTitles, searchString)).toBeTruthy();
     });
 
