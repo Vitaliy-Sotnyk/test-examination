@@ -1,14 +1,25 @@
 import { Page, Locator, APIRequestContext } from 'playwright';
+import errorMessageGenerator from './errorMessageGenerator';
 
 type ElementAction<T = void> = (element: Locator) => Promise<T>;
 
+export function performAction<T>(action: keyof Locator, args?: string[]): ElementAction<T> {
+    return async (element: Locator): Promise<T> => {
+        const method = element[action] as ((...args: string[]) => Promise<T>);
+        if (typeof method !== 'function') {
+            errorMessageGenerator(action, 'is not a valid method of Locator');
+        }
+        return args ? await method.call(element, ...args) as Promise<T> :
+                      await method.call(element) as Promise<T>;
+    };
+}
+
 export async function validateElement<T>(page: Page, selector: string, action: ElementAction<T>): Promise<T[]> {
-  const elements = page.locator(selector);
-  
+  const elements = await page.locator(selector);
   await elements.first().waitFor({ state: "visible", timeout: 10000 });
   const isElementVisible =  await elements.first().isVisible();
   if(!isElementVisible){
-    throw new Error(`Element with selector ${selector} not found`);
+    errorMessageGenerator(selector, 'is not found');
   }
 
   const count = await elements.count();
@@ -21,11 +32,51 @@ export async function validateElement<T>(page: Page, selector: string, action: E
   return results;
 }
 
-export async function getApiRequestWithApi<T>(request: APIRequestContext, url: string): Promise<T> {
-  const response = await request.get(url);
-  const status = response.status();
-  if (status < 200 || status >= 300) {
-    throw new Error(`API request to ${url} failed with status ${status}`);
+type ApiResponse<Data> = {
+  data?: Data[];
+  error?: string;
+};
+
+export async function getAllSearchedItemsWithApi<Item>(request: APIRequestContext, url: string, searchedItemName: string): Promise<Item[]> {
+  let offset = 0;
+  let hasMore = true;
+  const results: Item[] = []; 
+  const pageSize = 40;
+
+  while (hasMore) {
+    const response = await getApiRequest<ApiResponse<Item>>(request, `${url}api/v1/offers?offset=${offset}&query=${searchedItemName}`);
+    if (!response.data) {
+      hasMore = false;
+      break; 
+    }else {
+      offset += pageSize;
+    }
+    results.push(...response.data); 
   }
+  return results;
+}
+
+export async function getApiRequestWithApi<Item>(request: APIRequestContext, url: string): Promise<Item> {
+  const response: ApiResponse<Item> = await getApiRequest(request, url)
+  if (!response.data) {
+    errorMessageGenerator(url, status);
+  }
+  return response as Item;
+}
+
+
+async function getApiRequest<T>(request: APIRequestContext, url: string): Promise<T> {
+  const response = await request.get(url);
   return await response.json() as T;
+}
+
+type IPage = {
+  evaluate: (pageFunction: () => void | Promise<void>) => Promise<void>;
+  waitForLoadState: (state: LoadState) => Promise<void>;
+}
+type LoadState = "load" | "domcontentloaded" | "networkidle";
+
+export async function waitForScrolling<T extends IPage>(page: T): Promise<void> {
+  await page.evaluate(() => window.scrollBy(0, window.innerHeight));
+  await page.waitForLoadState("networkidle");
 }

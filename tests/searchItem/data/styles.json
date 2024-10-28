@@ -1,0 +1,32 @@
+{
+    "topFlag": {
+        "background-color": "rgb(35, 229, 219)",
+        "color": "rgb(0, 47, 52)",
+        "font-family": "Geomanist, Arial, sans-serif",
+        "font-size": "12px",
+        "font-weight": "700",
+        "line-height": "16px"
+    },
+    "itemTitleText": {
+        "color": "rgb(0, 47, 52)",
+        "font-family": "Geomanist, Arial, sans-serif",
+        "font-size": "20px",
+        "font-weight": "400",
+        "line-height": "22px"
+    },
+    "itemState": {
+        "background-color": "rgb(242, 244, 245)",
+        "color": "rgb(0, 47, 52)",
+        "font-family": "Geomanist, sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "line-height": "18px"
+    },
+    "itemPrice": {
+        "color": "rgb(0, 47, 52)",
+        "font-family": "Geomanist, Arial, sans-serif",
+        "font-size": "16px",
+        "font-weight": "700",
+        "line-height": "20px"
+    }
+}

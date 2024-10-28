@@ -1,53 +1,72 @@
 import { test, expect } from '@playwright/test';
-import MainPage from '../mainPage/pages/main.page';
-import { getApiRequestWithApi, validateElement } from '../utils/genericsUtils';
-import BasePage from '../basePage';
-import { everyItemsIncludes } from '../utils/dataFunctions';
+import MainPage from '../pages/main.page';
+import { getAllSearchedItemsWithApi, performAction, validateElement } from '../utils/genericsUtils';
+import { areNextNumberOfItemsPresentInTheList, everyItemsIncludesSearchElement, getAllValuesByParamsFromArrayOfObjects } from '../utils/dataFunctions';
+import keywords from './data/keyWords.json'
+import SearchItemsPage from '../pages/searchItems.page';
+import SearchedItem from '../interfaces/searchedItem';
+import { Decorators } from '../utils/decorator';
+import { expectedProperties } from './data/expectedProperties';
+import { itemsValidator } from '../utils/itemValidator';
 
-interface ApiResponse {
-    data: {
-      title: string;
-    }[];
-  }
-  
 test.describe('Playwright: search functionality of OLX', () => {
-    const searchString: string = 'iPhone';
- 
     test('search item in the system: api', async ({request, page}) => { 
-        const url = new BasePage(page);
-        const getOffersPath = 'api/v1/offers/?offset&query='
-        const response = await getApiRequestWithApi<ApiResponse>( request, `${url.pageUrl}${getOffersPath}${searchString}`);
-        const listOfTitles = response.data.map(item =>item.title);
-        expect(everyItemsIncludes(listOfTitles, searchString)).toBeTruthy();
+        const searchString: string = keywords.iphone;
+        const mainPage = new MainPage(page);
+        const response: SearchedItem[] = await getAllSearchedItemsWithApi(request, mainPage.pageUrl, searchString);
+        const listOfTitles = getAllValuesByParamsFromArrayOfObjects(response, 'title');
+        expect(everyItemsIncludesSearchElement(listOfTitles, searchString)).toBeTruthy();
     });
 
     test('search item in the system: ui', async ({ page }) => {
+        const searchString: string = keywords.iphone;
         const mainPage = new MainPage(page);
+        const searchPage = new SearchItemsPage(page);
         await mainPage.navigate();
-        await validateElement(page, '[data-testid="search-input"]', element => element.fill(searchString));
-        await validateElement(page, '[data-testid="search-submit"]', element => element.click());
-        const listOfTitles = await validateElement(page, '[data-testid="l-card"] h6', element => element.innerText());
-        expect(everyItemsIncludes(listOfTitles, searchString)).toBeTruthy();
+        await validateElement(page, mainPage.searchField, performAction('fill', [searchString]));
+        await validateElement(page, mainPage.searchButton, performAction('click'));
+        const listOfTitles: string[] = await validateElement(page, searchPage.searchedItemsTitle, performAction('innerText'));
+        console.log(listOfTitles);
+        expect(everyItemsIncludesSearchElement(listOfTitles, searchString)).toBeTruthy();
     });
 
-    test('search item in the system: api and ui', async ({ request, page }) => {
-        const url = new BasePage(page);
+    test('search item in the system: all api and ui first page', async ({ request, page }) => {
+        const searchString: string = keywords.iphone6S;
         const mainPage = new MainPage(page);
-        const listOfTitlesApi: string[] = [];
-
-        for(let i=0; i<=1000; i=i+40) {
-            const getOffersPath = `api/v1/offers?offset=${i}&query=`;
-            const response = await getApiRequestWithApi<ApiResponse>( request, `${url.pageUrl}${getOffersPath}${searchString}`);
-            listOfTitlesApi.push(...response.data.map(item =>item.title));
-        }
-
+        const searchPage = new SearchItemsPage(page);
+        const response: SearchedItem[] = await getAllSearchedItemsWithApi(request, mainPage.pageUrl, searchString);
+        const listOfTitlesApi = getAllValuesByParamsFromArrayOfObjects(response, 'title');
         await mainPage.navigate();
-        await validateElement(page, '[data-testid="search-input"]', element => element.fill(searchString));
-        await validateElement(page, '[data-testid="search-submit"]', element => element.click());
-        
-        const listOfTitlesUi = await validateElement(page, '[data-testid="l-card"] h6', element => element.innerText());
-        for(let index = 0; index < 2; index++){
-            expect(listOfTitlesApi).toContain(listOfTitlesUi[index]);
-        }
+        await validateElement(page, mainPage.searchField, performAction('fill', [searchString]));
+        await validateElement(page, mainPage.searchButton,  performAction('click'));
+        const listOfTitlesUi: string[] = await validateElement(page, searchPage.searchedItemsTitle, performAction('innerText'));
+        expect(areNextNumberOfItemsPresentInTheList({list: listOfTitlesApi, expectedItems: listOfTitlesUi, numberOfItems: 9})).toBeTruthy();
+    });
+
+    test('check items with decorators: ui', async ({ page }) => {
+        const searchString: string = keywords.iphone6S;
+        const mainPage = new MainPage(page);
+        const searchPage = new SearchItemsPage(page)
+        const decorators = new Decorators(page);
+        await mainPage.navigate();
+        await validateElement(page, mainPage.searchField, performAction('fill', [searchString]));
+        await validateElement(page, mainPage.searchButton,  performAction('click'));
+        await itemsValidator({
+            page: page, 
+            decorator: decorators, 
+            selector: searchPage.searchedItemsBox, 
+            children: [
+                searchPage.searchedItemsPromotionStatus, 
+                searchPage.searchedItemsState, 
+                searchPage.searchedItemsTitle, 
+                searchPage.searchedItemsPrice
+            ], 
+            expectedProperties: [
+                expectedProperties.searchedItemsPromotionStatus, 
+                expectedProperties.searchedItemsState, 
+                expectedProperties.searchedItemsTitle, 
+                expectedProperties.searchedItemsPrice
+            ] 
+        });
     });
 });
