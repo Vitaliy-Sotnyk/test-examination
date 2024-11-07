@@ -1,8 +1,24 @@
 import ElementVariables from "../interfaces/elementVariables";
 import SearchedItem from "../interfaces/searchedItem";
 
+function cyrillicToLatin(input: string) {
+    const cyrillicMap: { [key: string]: string } = {
+        'а': 'a', 'в': 'b', 'д': 'd', 'е': 'e', 
+        'и': 'u', 'і': 'i', 'к': 'k', 'м': 'm', 
+        'н': 'h', 'о': 'o', 'p': 'p', 'с': 'c',
+        'т': 't', 'у': 'y', 'х': 'x', 'ш': 'w'
+    };
+
+    return input.toLowerCase().replace(/[\s\S]/g, function(char: string) {
+        return cyrillicMap[char] || char;
+    });
+}
+
 export function everyItemsIncludesSearchElement(list: string[], searchElement: string): boolean {
-    return list.every((item => item.toLowerCase().includes(searchElement.toLowerCase())))
+    return list.every((item => {
+        const normalizedString = cyrillicToLatin(item);
+        return normalizedString.includes(searchElement.toLowerCase())
+    }));
 }
 
 export function getAllValuesByParamsFromArrayOfObjects<T extends keyof SearchedItem>(list: SearchedItem[], parameter: T): SearchedItem[T][]{
@@ -21,14 +37,18 @@ export function mapData(items: SearchedItem[], property: keyof SearchedItem, sty
         if (item.promotion.top_ad) {
             return { expectedText: '', expectedStyle: style };
         } else {
-            let value: string | undefined;
+            let directValue: string | undefined;
             if (key && property === 'params') {
-                value = item.params.find(param => param.key === key)?.value?.label;
+                directValue = item.params.find(param => param.key === key)?.value?.label;
             } else {
-                const directValue = item[property];
-                value = typeof directValue === 'string' ? directValue : '';
+                directValue = item[property].toString();
             }
+            const value: string | undefined = typeof directValue === 'string' ? directValue : '';
             return { expectedText: value, expectedStyle: style };
         }
     });
+}
+
+export function getRandomIndex(arrayLength: number): number {
+    return Math.floor(Math.random() * arrayLength);
 }
