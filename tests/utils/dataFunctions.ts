@@ -9,7 +9,11 @@ function cyrillicToLatin(input: string) {
         'т': 't', 'у': 'y', 'х': 'x', 'ш': 'w'
     };
 
-    return input.toLowerCase().replace(/[\s\S]/g, function(char: string) {
+    return input
+    .trim()
+    .replace(/ +/g, ' ') 
+    .toLowerCase() 
+    .replace(/[\s\S]/g, function(char: string) {
         return cyrillicMap[char] || char;
     });
 }
@@ -17,7 +21,7 @@ function cyrillicToLatin(input: string) {
 export function everyItemsIncludesSearchElement(list: string[], searchElement: string): boolean {
     return list.every((item => {
         const normalizedString = cyrillicToLatin(item);
-        return normalizedString.includes(searchElement.toLowerCase())
+        return normalizedString.includes(searchElement.toLowerCase());
     }));
 }
 
@@ -26,9 +30,10 @@ export function getAllValuesByParamsFromArrayOfObjects<T extends keyof SearchedI
 }
 
 export function areNextNumberOfItemsPresentInTheList(data: {list: string[], expectedItems: string[], numberOfItems: number}): boolean{ 
+    const normalizedList =  data.list.map(item => cyrillicToLatin(item));
     return data.expectedItems.slice(0, data.numberOfItems-1)
         .every(item => {
-            return data.list.includes(item);
+            return normalizedList.includes(cyrillicToLatin(item));
         })
 }
 

@@ -9,5 +9,4 @@ test.describe('Playwright: main page of OLX', () => {
         expect(await mainPage.getTitle()).toEqual(pageData.pageTitle); 
         expect(await page.textContent(mainPage.title)).toEqual(pageData.title);
     });
-    
 });

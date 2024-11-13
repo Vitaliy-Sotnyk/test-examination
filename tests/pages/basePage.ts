@@ -1,4 +1,5 @@
 import { Page } from "playwright-core";
+import selectors from './selectors.json';
 
 class BasePage {
     public page: Page;
@@ -9,16 +10,12 @@ class BasePage {
     constructor(page: Page) {
         this.page = page;
         this.pageUrl = process.env.BASE_URL || '';
-        this.searchField = '[data-testid="search-input"]';
-        this.searchButton = '[data-testid="search-submit"]';
+        this.searchField = selectors.searchField;
+        this.searchButton = selectors.searchButton;
     }
 
-    async navigate() {
-        try{
-            await this.page.goto(this.pageUrl);
-        } catch {
-            throw new Error('url is invalid');
-        }
+    async navigate() {  
+        await this.page.goto(this.pageUrl);
     }
 
     async getTitle() {

@@ -1,0 +1,10 @@
+{
+    "searchField":  "[data-testid='search-input']",
+    "searchButton": "[data-testid='search-submit']",
+    "mainPageTitle": "[data-testid='home-categories-title']",
+    "searchedItemsBox": "//div[@data-testid='l-card']",
+    "searchedItemsPromotionStatus": "//div[@data-testid='card-delivery-badge']//preceding-sibling::div",
+    "searchedItemsTitle": "[data-cy='ad-card-title'] h6",
+    "searchedItemsPrice": "[data-testid='ad-price']",
+    "searchedItemsState": "//span[@title]"
+}

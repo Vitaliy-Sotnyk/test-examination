@@ -9,16 +9,11 @@ export default defineConfig({
   testMatch: '**/**/*playwright.spec.ts',
   fullyParallel: true,
   forbidOnly: true,
-  retries: 2,
+  retries: 0,
   workers: 1,
-  reporter:  [
-    [ 'html', {
-      outputFolder: './reports/playwright',
-      } 
-    ],
-  ],
+  reporter: [['pwmochawesome', { reportDir: "reports/playwright"}]],
   use: {
-    headless: false, // Run tests in headless browsers.
+    headless: false,
     trace: 'on-first-retry',
   },
 
@@ -29,7 +24,6 @@ export default defineConfig({
         ...devices['Desktop Chrome'] 
       },
     },
-
     {
       name: 'firefox',
       use: { 
@@ -44,8 +38,9 @@ export default defineConfig({
       },
     },
   ],
-  timeout: 1200000,
+  maxFailures: 1,
+  timeout: 120000,
   expect: {
-      timeout: 1200000
+      timeout: 120000
   },
 });
